@@ -36,15 +36,19 @@ Vue.use(VueProgressBar, {
 let routes = [
     {
         path: '/dashboard',
-        component: require('./components/Dashboard.vue')
+        component: require('./components/Dashboard.vue').default
+    },
+    {
+        path: '/developer',
+        component: require('./components/Developer.vue').default
     },
     {
         path: '/users',
-        component: require('./components/Users.vue')
+        component: require('./components/Users.vue').default
     },
     {
         path: '/profile',
-        component: require('./components/Profile.vue')
+        component: require('./components/Profile.vue').default
     }
 ]
 
@@ -67,7 +71,26 @@ window.Fire = new Vue()
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'))
+// Laravel Passport
+Vue.component(
+    'passport-clients',
+    require('../../js/components/passport/Clients.vue').default
+)
+
+Vue.component(
+    'passport-authorized-clients',
+    require('../../js/components/passport/AuthorizedClients.vue').default
+)
+
+Vue.component(
+    'passport-personal-access-tokens',
+    require('../../js/components/passport/PersonalAccessTokens.vue').default
+)
+
+Vue.component(
+    'example-component',
+    require('./components/ExampleComponent.vue').default
+)
 
 const app = new Vue({
     el: '#app',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
+// use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -12,6 +13,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        // $this->authorize('isAdmin');
     }
     /**
      * Display a listing of the resource.
@@ -20,7 +22,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::latest()->paginate(10);
+        //$this->authorize('isAdmin'); // it declare in authservice provider Gate
+        if (\Gate::allows('isAdmin') || \Gate::allows('isAuthor')) {
+            return User::latest()->paginate(5);
+        }
     }
 
     /**
@@ -117,14 +122,27 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @ param  int  $id
+     * @ return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
+        $this->authorize('isAdmin');
         $user = User::findOrFail($id);
         $user->delete();
-
+        
         return ['message'=>'User Deleted'];
+    }
+
+    public function search()
+    {
+        if ($search = \Request::get('q')) {
+            $users = User::where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%$search%")->orWhere('email', 'LIKE', "%$search%");
+            })->paginate(20);
+        } else {
+            $users = User::latest()->paginate(5);
+        }
+        return $users;
     }
 }

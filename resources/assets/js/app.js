@@ -10,6 +10,9 @@ window.Vue = require('vue')
 import moment from 'moment'
 import { Form, HasError, AlertError } from 'vform'
 
+import Gate from './Gate'
+Vue.prototype.$gate = new Gate(window.user)
+
 import Swal from 'sweetalert2'
 window.Swal = Swal
 const Toast = Swal.mixin({
@@ -23,6 +26,7 @@ window.Toast = Toast
 window.Form = Form
 Vue.component(HasError.name, HasError)
 Vue.component(AlertError.name, AlertError)
+Vue.component('pagination', require('laravel-vue-pagination'))
 
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
@@ -49,6 +53,10 @@ let routes = [
     {
         path: '/profile',
         component: require('./components/Profile.vue').default
+    },
+    {
+        path: '*',
+        component: require('./components/NotFound.vue').default
     }
 ]
 
@@ -91,8 +99,20 @@ Vue.component(
     'example-component',
     require('./components/ExampleComponent.vue').default
 )
+Vue.component('not-found', require('./components/NotFound.vue').default)
 
 const app = new Vue({
     el: '#app',
-    router
+    router,
+    data: {
+        search: ''
+    },
+    methods: {
+        searchit: _.debounce(() => {
+            Fire.$emit('searching')
+        }, 1000),
+        printme() {
+            window.print()
+        }
+    }
 })
